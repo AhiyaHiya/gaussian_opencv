@@ -14,6 +14,8 @@ using namespace std;
 
 int main(int argc, char** argv)
 {
+  auto appStart = std::chrono::high_resolution_clock::now();
+
   // Expects parameter passed in is the image to apply the gaussian blur to
   // Expects second parameter to be the output path to where you want to save the blurred image.
   // Setup program options
@@ -78,15 +80,10 @@ int main(int argc, char** argv)
     return -1;
   }
 
-  // Perform a box blur
-  auto start = std::chrono::high_resolution_clock::now();
-  int blurSize = int((float)blur * 3. * sqrt(2. * M_PI) / 4. + 0.5) | 1;
+  // Perform a box blur (note blur means sigma of Gaussian blur)
+  int kernelSize = int((float)blur * 3. * sqrt(2. * M_PI) / 4. + 0.5) | 1;
   for (int i = 0; i < 3; i++)
-    cv::blur(sourceImage, sourceImage, cv::Size(blurSize, blurSize));
-
-  auto stop = std::chrono::high_resolution_clock::now();
-  auto duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start).count();
-  printf("Guassian blur completed in: %lu\n", duration);
+    cv::blur(sourceImage, sourceImage, cv::Size(kernelSize, kernelSize));
 
   // Save image to disk
   auto result = false;
@@ -103,4 +100,8 @@ int main(int argc, char** argv)
     printf("Success\n");
   else
     printf("Error\n");
+
+  auto appStop = std::chrono::high_resolution_clock::now();
+  auto appDuration = std::chrono::duration_cast<std::chrono::microseconds>(appStop - appStart).count();
+  printf("App time: %lu\n", appDuration);
 }
